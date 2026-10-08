@@ -11,11 +11,12 @@ SECRET = "s3cret"
 
 
 @pytest.fixture
-def client(monkeypatch):
+def client(monkeypatch, tmp_path):
     monkeypatch.setenv("WHATSAPP_TOKEN", "t")
     monkeypatch.setenv("WHATSAPP_PHONE_NUMBER_ID", "123")
     monkeypatch.setenv("WHATSAPP_VERIFY_TOKEN", "verify-me")
     monkeypatch.setenv("WHATSAPP_APP_SECRET", SECRET)
+    monkeypatch.setenv("DATABASE_FILE", str(tmp_path / "j.db"))
     get_settings.cache_clear()
     from app.main import app
 
@@ -79,3 +80,14 @@ def test_replies_once_per_message(client):
     assert client.post("/webhook", content=raw, headers=headers).status_code == 200  # Meta retry
     assert len(client.sent) == 1
     assert client.sent[0][0] == "4917"
+
+
+def test_ignores_numbers_not_in_owner_list(client, monkeypatch):
+    client.app.state.settings.owner_numbers = "+972 50-000-0000"
+    raw, headers = signed(text_payload(msg_id="w9"))
+    assert client.post("/webhook", content=raw, headers=headers).status_code == 200
+    assert client.sent == []
+    client.app.state.settings.owner_numbers = "4917"
+    raw, headers = signed(text_payload(msg_id="w10"))
+    client.post("/webhook", content=raw, headers=headers)
+    assert len(client.sent) == 1

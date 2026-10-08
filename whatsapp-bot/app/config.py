@@ -17,11 +17,21 @@ class Settings(BaseSettings):
     # App Settings > Basic > App Secret. Used to check that webhook calls really come from Meta.
     whatsapp_app_secret: str = ""
 
+    # Phone numbers allowed to use the journal, with country code, comma separated (e.g. 972501234567).
+    # Messages from anyone else are ignored. Empty = anyone can use it.
+    owner_numbers: str = ""
+    # Time zone for entry dates, e.g. Asia/Jerusalem, Europe/London, America/New_York
+    timezone: str = "UTC"
+
     graph_api_version: str = "v23.0"
-    flows_file: Path = BASE_DIR / "flows.yaml"
-    # How long a user stays in a sub-menu / human hand-off before the bot resets them
-    session_ttl_minutes: int = 30
-    handoff_minutes: int = 60
+    journal_file: Path = BASE_DIR / "journal.yaml"
+    database_file: Path = BASE_DIR / "data" / "journal.db"
+    # An unfinished entry is discarded after this many hours without an answer
+    draft_ttl_hours: int = 12
+
+    @property
+    def owners(self) -> set[str]:
+        return {"".join(ch for ch in n if ch.isdigit()) for n in self.owner_numbers.split(",") if n.strip()}
 
 
 @lru_cache

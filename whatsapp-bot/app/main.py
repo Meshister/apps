@@ -4,12 +4,14 @@ import logging
 from collections import OrderedDict
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Query, Request
 from fastapi.responses import PlainTextResponse
 
-from .bot import Bot, load_flows
 from .config import get_settings
+from .journal import Journal, load_config
+from .store import Store
 from .whatsapp import IncomingMessage, WhatsAppClient, parse_webhook
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -37,10 +39,12 @@ class SeenMessages:
 async def lifespan(app: FastAPI):
     settings = get_settings()
     app.state.settings = settings
-    app.state.bot = Bot(
-        load_flows(settings.flows_file),
-        session_ttl=timedelta(minutes=settings.session_ttl_minutes),
-        handoff_duration=timedelta(minutes=settings.handoff_minutes),
+    store = Store(settings.database_file)
+    app.state.journal = Journal(
+        load_config(settings.journal_file),
+        store,
+        tz=ZoneInfo(settings.timezone),
+        draft_ttl=timedelta(hours=settings.draft_ttl_hours),
     )
     app.state.client = WhatsAppClient(
         settings.whatsapp_token, settings.whatsapp_phone_number_id, settings.graph_api_version
@@ -48,11 +52,14 @@ async def lifespan(app: FastAPI):
     app.state.seen = SeenMessages()
     if not settings.whatsapp_app_secret:
         log.warning("WHATSAPP_APP_SECRET is not set: webhook signatures will NOT be verified")
+    if not settings.owners:
+        log.warning("OWNER_NUMBERS is not set: anyone who messages this number can use the journal")
     yield
     await app.state.client.aclose()
+    store.close()
 
 
-app = FastAPI(title="WhatsApp menu bot", lifespan=lifespan)
+app = FastAPI(title="WhatsApp emotion journal", lifespan=lifespan)
 
 
 @app.get("/health")
@@ -100,8 +107,13 @@ async def receive_webhook(request: Request, background: BackgroundTasks):
 
 async def process_message(app: FastAPI, msg: IncomingMessage) -> None:
     try:
-        log.info("From %s (%s): %r", msg.sender, msg.kind, msg.text or msg.choice_id)
-        replies = app.state.bot.handle(msg, datetime.now(timezone.utc))
+        owners = app.state.settings.owners
+        if owners and msg.sender not in owners:
+            log.info("Ignoring message from %s (not in OWNER_NUMBERS)", msg.sender)
+            return
+        # Journal text is private, so only the message type is logged
+        log.info("Message from %s (%s)", msg.sender, msg.kind)
+        replies = app.state.journal.handle(msg, datetime.now(timezone.utc))
         if replies:
             await app.state.client.mark_read(msg.message_id)
         for reply in replies:

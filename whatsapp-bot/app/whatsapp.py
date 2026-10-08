@@ -35,7 +35,17 @@ class ListMenu:
     section_title: str = "Options"
 
 
-Reply = Text | Buttons | ListMenu
+@dataclass
+class Document:
+    """A file sent as a WhatsApp document (uploaded first, then sent)."""
+
+    filename: str
+    content: bytes
+    caption: str = ""
+    mime_type: str = "text/plain"
+
+
+Reply = Text | Buttons | ListMenu | Document
 
 
 @dataclass
@@ -122,9 +132,30 @@ class WhatsAppClient:
         )
 
     async def send(self, to: str, reply: Reply) -> None:
-        resp = await self._http.post("/messages", json=to_payload(to, reply))
+        if isinstance(reply, Document):
+            payload = await self._document_payload(to, reply)
+            if payload is None:
+                return
+        else:
+            payload = to_payload(to, reply)
+        resp = await self._http.post("/messages", json=payload)
         if resp.is_error:
             log.error("Send to %s failed (%s): %s", to, resp.status_code, resp.text)
+
+    async def _document_payload(self, to: str, doc: Document) -> dict | None:
+        resp = await self._http.post(
+            "/media",
+            data={"messaging_product": "whatsapp", "type": doc.mime_type},
+            files={"file": (doc.filename, doc.content, doc.mime_type)},
+        )
+        if resp.is_error:
+            log.error("Upload of %s failed (%s): %s", doc.filename, resp.status_code, resp.text)
+            return None
+        document = {"id": resp.json()["id"], "filename": doc.filename}
+        if doc.caption:
+            document["caption"] = doc.caption
+        return {"messaging_product": "whatsapp", "recipient_type": "individual", "to": to,
+                "type": "document", "document": document}
 
     async def mark_read(self, message_id: str) -> None:
         resp = await self._http.post(

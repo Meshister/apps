@@ -1,124 +1,72 @@
-# WhatsApp menu bot
+# WhatsApp emotion journal
 
-A rule-based WhatsApp chatbot (menus, buttons, keyword answers, hand-off to a human) built on the
-official **WhatsApp Cloud API** from Meta, with a small **FastAPI** webhook server.
+A private WhatsApp bot for journaling your feelings with the **Emotion & Feeling Wheel**
+(Junto Institute). It runs on the official **WhatsApp Cloud API** from Meta.
 
-Everything the bot says is in [`flows.yaml`](flows.yaml), so you can change the conversation without touching code.
+## How an entry works
 
-```
-User on WhatsApp ──► Meta ──POST /webhook──► this server ──► flows.yaml rules
-                     ◄────── Graph API /messages ◄──────────── replies
-```
+1. **Opening questions** (optional, set in `journal.yaml`)
+2. **Inner circle → middle ring → outer ring** of the wheel. Each outer word shows similar words under it.
+3. The bot **explains** the word, gives a **tip to try instead**, and a **question to reflect on**
+4. **Check-in questions** you answer with a tap: strength 1–10, where in the body, where you are,
+   who you're with, what it's connected to, what your body wants
+5. **Free writing**
+6. **Saved** with date and time
 
-## Features
+From the main menu: **📝 New entry**, **📖 My journal** (last 5 entries) and **📤 Export journal**
+(the bot sends your whole journal as a `.txt` file in the chat).
 
-- Main menu and sub-menus shown as WhatsApp **reply buttons** (≤3 options) or **list pickers** (≤10)
-- Users can tap, type the option number (`2`) or type the option title
-- Keyword answers anywhere in a message (`"what are your hours?"` → opening hours)
-- `menu` / `hi` resets, `back` goes to the previous menu, `{name}` personalizes messages
-- "Talk to a person" hand-off: the bot goes silent for that user until they type `menu` (or a timeout)
-- Webhook signature check, duplicate-delivery protection, flow validation at startup
-  (e.g. a button title that's too long fails on boot, not when a customer taps it)
+Type `menu` anytime to cancel, `back` to go up a ring, `skip` to skip a question.
+Only the phone numbers in `OWNER_NUMBERS` can use the bot; messages from anyone else are ignored.
 
-## 1. Try it locally (no WhatsApp needed)
+## Changing what the bot says
 
-```bash
-cd whatsapp-bot
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-python chat.py      # chat with the bot in your terminal
-pytest              # run the tests
-```
+Everything is in [`journal.yaml`](journal.yaml): the questions, the wheel words, the similar words,
+explanations, tips and reflection questions. You can edit it directly on GitHub (click the file → ✏️).
+The server checks the file when it starts and reports anything that WhatsApp wouldn't accept
+(for example a choice longer than 24 characters).
 
-## 2. Set up WhatsApp on Meta
+## Setup
 
-1. Go to <https://developers.facebook.com/apps>, **Create app** → use case *Other* → type **Business**.
-2. Add the **WhatsApp** product. On **WhatsApp → API Setup** you get:
-   - a free **test phone number** and its **Phone number ID**
-   - a **temporary access token** (valid 24h)
-   - a "To" field: add your own phone number as a test recipient (only verified numbers can chat with a test number)
+### 1. Meta
+1. Create an app at <https://developers.facebook.com/apps> (use case: *Connect with customers through WhatsApp*).
+2. On **WhatsApp → API Setup** note the **Phone number ID** and **access token**, and add your own
+   phone number as a recipient.
 3. **App settings → Basic** → copy the **App Secret**.
-4. Create your config:
-   ```bash
-   cp .env.example .env    # then fill in the 4 values
-   ```
 
-## 3. Run the server and connect the webhook
+### 2. Configuration
+Copy `.env.example` to `.env` (or enter the same values as environment variables on your host):
 
+| Setting | What to put |
+|---|---|
+| `WHATSAPP_TOKEN` | access token |
+| `WHATSAPP_PHONE_NUMBER_ID` | phone number ID |
+| `WHATSAPP_VERIFY_TOKEN` | any secret word you make up |
+| `WHATSAPP_APP_SECRET` | app secret |
+| `OWNER_NUMBERS` | your number with country code, digits only, e.g. `972501234567` |
+| `TIMEZONE` | e.g. `Asia/Jerusalem`, `Europe/London` |
+
+### 3. Run it
 ```bash
+pip install -r requirements.txt
 uvicorn app.main:app --port 8000
 ```
+or with Docker: `docker build -t journal . && docker run -p 8000:8000 --env-file .env -v journal-data:/app/data journal`
 
-Meta must reach your server over public HTTPS. While developing, use a tunnel:
+Then in Meta: **WhatsApp → Configuration → Webhook**: callback URL `https://<your-server>/webhook`,
+verify token = your `WHATSAPP_VERIFY_TOKEN`, and subscribe to the **messages** field.
 
+### ⚠️ Keep your journal safe
+Entries are stored in a SQLite file, `data/journal.db`. Your host must keep that folder between restarts
+(a "persistent disk" or "volume"); many free hosts wipe files on every restart. Export your journal now
+and then as a backup.
+
+## For developers
 ```bash
-ngrok http 8000          # or: cloudflared tunnel --url http://localhost:8000
+python chat.py   # try the conversation in a terminal, no WhatsApp needed
+pytest           # tests
 ```
-
-In Meta: **WhatsApp → Configuration → Webhook → Edit**
-- Callback URL: `https://<your-tunnel-domain>/webhook`
-- Verify token: the `WHATSAPP_VERIFY_TOKEN` from your `.env`
-- Click **Verify and save**, then under **Webhook fields** subscribe to **messages**.
-
-Now send "hi" from your phone to the test number. 🎉
-
-## 4. Customize the conversation
-
-Edit `flows.yaml` (it's commented) and restart the server. The building blocks:
-
-```yaml
-menus:
-  main:
-    body: "Hi {name}! How can we help?"
-    options:
-      - id: hours                  # unique id
-        title: "Opening hours"     # button/row text
-        reply: "We're open 9–18"   # text to send...
-      - id: faq
-        title: "FAQ"
-        goto: faq                  # ...and/or another menu to show
-      - id: human
-        title: "Talk to a person"
-        reply: "Someone will reply soon"
-        handoff: true              # bot goes quiet for HANDOFF_MINUTES
-
-keywords:
-  - words: [price, cost]
-    goto: products
-```
-
-Run `pytest` or `python chat.py` after editing — invalid flows are reported with a clear list of what's wrong.
-
-## 5. Going to production
-
-- **Permanent token:** the 24h token expires. Create a *System User* in Meta Business Settings,
-  give it the app and WhatsApp account, and generate a token with
-  `whatsapp_business_messaging` and `whatsapp_business_management` permissions.
-- **Real phone number:** add your business number in WhatsApp Manager and verify your business.
-  A number registered on the Cloud API can't also be used in the regular WhatsApp app.
-- **Hosting:** any host that runs a container works (Render, Railway, Fly.io, Cloud Run, a VPS):
-  ```bash
-  docker build -t whatsapp-bot . && docker run -p 8000:8000 --env-file .env whatsapp-bot
-  ```
-- **Run a single instance** (or one uvicorn worker): conversation state is kept in memory, so
-  multiple workers would each have their own state, and a restart resets everyone to the main menu.
-  To scale out, move `Bot.sessions` and `SeenMessages` to Redis.
-- **Human hand-off:** the bot only stops replying; your team still needs a way to answer, for
-  example an inbox tool connected to the same number, or extend `process_message` in
-  `app/main.py` to forward the conversation to email/Slack.
-- **24-hour rule:** WhatsApp only allows free-form replies within 24h of the user's last message.
-  This bot only ever replies to incoming messages, so that's fine. Messaging users first
-  requires pre-approved *template messages*.
-
-## Project layout
-
-```
-app/
-  main.py       FastAPI app: webhook verification, signature check, dedupe, dispatch
-  bot.py        conversation engine + flows.yaml loading/validation (pure logic, no I/O)
-  whatsapp.py   Cloud API client, webhook parsing, message payloads
-  config.py     settings from environment / .env
-flows.yaml      the conversation
-chat.py         terminal simulator
-tests/          pytest suite
-```
+- `app/journal.py`: conversation logic and `journal.yaml` loading/validation (no network)
+- `app/store.py`: SQLite storage of entries and unfinished entries
+- `app/whatsapp.py`: Cloud API client (messages, lists, buttons, document upload) and webhook parsing
+- `app/main.py`: FastAPI webhook: verification, signature check, owner filter, duplicate protection
