@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     # Messages from anyone else are ignored. Empty = anyone can use it.
     owner_numbers: str = ""
     # Time zone for entry dates, e.g. Asia/Jerusalem, Europe/London, America/New_York
-    timezone: str = "UTC"
+    timezone: str = "Asia/Jerusalem"
 
     graph_api_version: str = "v23.0"
     journal_file: Path = BASE_DIR / "journal.yaml"
