@@ -1,0 +1,99 @@
+# Conversation design for the bot. Edit this file and restart the server to change what the bot says.
+#
+# MENUS
+#   Each menu is shown as WhatsApp buttons (up to 3 options, titles <= 20 chars) or as a
+#   list picker (up to 10 options, titles <= 24 chars, descriptions <= 72 chars).
+#   `style: auto` (the default) picks buttons when they fit, otherwise a list.
+#   Users can tap an option, type its number (1, 2, ...) or type its title.
+#
+#   Every option needs a unique `id` and at least one of:
+#     reply:   text to send (supports *bold*, _italic_, emojis, and {name} = the user's WhatsApp name)
+#     goto:    name of another menu to show
+#     handoff: true -> the bot stays silent for HANDOFF_MINUTES so a person can take over
+#
+# KEYWORDS
+#   Checked when the message doesn't match the current menu. If any of `words` appears in the
+#   message, send `reply` and/or show menu `goto`.
+#
+# reset_words always bring the user back to start_menu; back_words go to the previous menu.
+# A brand-new user who sends anything that isn't a keyword gets the start menu.
+
+start_menu: main
+
+reset_words: [menu, start, hi, hello, hey, "0"]
+back_words: [back]
+
+fallback: "Sorry {name}, I didn't get that 🤔\nType *menu* to see what I can help with."
+handoff_ended: "👋 You're chatting with the bot again."
+
+menus:
+  main:
+    header: "Welcome to Acme Store"
+    body: "Hi {name}! 👋 How can we help you today?"
+    footer: "Type *menu* anytime to come back here"
+    button: "See options"
+    options:
+      - id: products
+        title: "Products & prices"
+        description: "Browse what we sell"
+        goto: products
+      - id: order_status
+        title: "Track my order"
+        description: "Check where your order is"
+        reply: "📦 Track your order at https://example.com/track using the order number from your confirmation email."
+      - id: hours
+        title: "Opening hours"
+        description: "When and where to find us"
+        reply: "🕘 *Mon–Fri:* 9:00–18:00\n🕙 *Sat:* 10:00–16:00\n❌ *Sun:* closed\n\n📍 123 Main Street"
+      - id: faq
+        title: "FAQ"
+        description: "Delivery, returns, payments"
+        goto: faq
+      - id: human
+        title: "Talk to a person"
+        description: "Chat with our team"
+        reply: "Sure! A team member will reply here shortly. 🙋\n(Type *menu* to go back to the bot.)"
+        handoff: true
+
+  products:
+    body: "Which category are you interested in?"
+    options:
+      - id: cat_clothing
+        title: "Clothing"
+        reply: "👕 T-shirts from $15, hoodies from $35, jackets from $60.\nSee everything at https://example.com/clothing"
+      - id: cat_shoes
+        title: "Shoes"
+        reply: "👟 Sneakers from $50, boots from $80.\nSee everything at https://example.com/shoes"
+      - id: cat_back
+        title: "⬅️ Main menu"
+        goto: main
+
+  faq:
+    body: "Pick a question:"
+    button: "Questions"
+    options:
+      - id: faq_delivery
+        title: "Delivery times"
+        description: "How long shipping takes"
+        reply: "🚚 Standard delivery takes 2–4 business days. Express (next day) is $9.99."
+      - id: faq_returns
+        title: "Returns"
+        description: "Our 30-day return policy"
+        reply: "↩️ You can return unused items within 30 days for a full refund. Start a return at https://example.com/returns"
+      - id: faq_payment
+        title: "Payment methods"
+        description: "Cards, PayPal, cash"
+        reply: "💳 We accept Visa, Mastercard, PayPal and cash on delivery."
+      - id: faq_back
+        title: "⬅️ Main menu"
+        goto: main
+
+keywords:
+  - words: [hours, open, opening, closed, timing]
+    reply: "🕘 We're open Mon–Fri 9:00–18:00 and Sat 10:00–16:00."
+  - words: [price, prices, cost, catalog, catalogue]
+    goto: products
+  - words: [refund, return, returns]
+    reply: "↩️ You can return unused items within 30 days for a full refund: https://example.com/returns"
+  - words: [thanks, thank you, thx]
+    reply: "You're welcome, {name}! 😊"
