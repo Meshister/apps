@@ -338,6 +338,7 @@ class Journal:
             inner, middle = state["path"]
             word = self.cfg.wheel[inner][middle].words[answer]
             draft["feeling"] = [inner, middle, answer]
+            draft["tip"] = word.tip
             draft["reflect"] = word.reflect
             replies.append(Text(self._explain(word)))
             state.update(step="checkin" if self.cfg.checkin else "free", i=0)
@@ -417,6 +418,8 @@ def format_entry(e: dict, rich: bool) -> str:
         lines.append(f"{b('Feeling:')} {' → '.join(e['feeling'])}")
     for qa in e.get("checkin", []):
         lines.append(f"• {qa['q']} {qa['a']}")
+    if e.get("tip"):
+        lines.append(f"{b('Try instead:')} {e['tip']}")
     if e.get("reflect"):
         lines.append(f"{b('Reflect:')} {e['reflect']}")
     if e.get("writing"):

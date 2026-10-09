@@ -118,6 +118,7 @@ def test_full_entry_goes_inner_to_outer_then_questions(journal):
     assert "Fear → Nervous → Anxious" in saved.body
     assert "Thu 08 Oct 2026, 21:30" in saved.body  # shown in the configured time zone
     assert "Where are you? Gym" in saved.body
+    assert "Try instead:* Take a 10-minute walk" in saved.body
     assert isinstance(menu, Buttons)
     assert journal.store.get_state("111") is None
 
