@@ -20,11 +20,13 @@ opening_questions:
     choices: ["Yes", "No", "Not sure"]
   - id: feel_eat
     text: "How will I feel if I eat it?"
-    choices: [Satisfied, Calmer, Guilty, Regretful, Heavy, Same as now]
+    choices: [Satisfied, Calmer, Comforted, Happy for a moment, Guilty, Regretful, Ashamed,
+              Heavy / bloated, Out of control, Same as now]
     other: true
   - id: feel_skip
     text: "How will I feel if I don't eat it?"
-    choices: [Proud, Relieved, Deprived, Restless, Anxious, Same as now]
+    choices: [Proud, Relieved, In control, Strong, Calm, Deprived, Restless, Anxious, Irritable,
+              Same as now]
     other: true
 
 # The question that opens the wheel.
