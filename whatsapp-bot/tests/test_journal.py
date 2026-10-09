@@ -47,7 +47,10 @@ def write_entry(journal, sender="111", writing="Big meeting tomorrow", when=T0):
     explain, reply = tap(journal, reply, "Anxious", sender, when)
     for answer in ["7", "Chest", "Home", "Close family", "Work", "Rest"]:
         [reply] = tap(journal, reply, answer, sender, when)
-    return explain, journal.handle(msg(writing, sender=sender), when)
+    [reply] = journal.handle(msg(writing, sender=sender), when)
+    [reply] = tap(journal, reply, "Both", sender, when)
+    [reply] = tap(journal, reply, "Weaker", sender, when)
+    return explain, journal.handle(msg("The walk", sender=sender), when)
 
 
 def test_config_is_valid():
@@ -55,6 +58,7 @@ def test_config_is_valid():
     assert list(cfg.wheel) == ["Fear", "Anger", "Sadness", "Surprise", "Joy", "Love"]
     assert sum(len(m.words) for ms in cfg.wheel.values() for m in ms.values()) == 68
     assert all(m.similar for ms in cfg.wheel.values() for m in ms.values())
+    assert all(w.body for ms in cfg.wheel.values() for m in ms.values() for w in m.words.values())
 
 
 def test_any_message_shows_main_menu(journal):
@@ -91,6 +95,7 @@ def test_full_entry_goes_inner_to_outer_then_questions(journal):
 
     explain, first_q = tap(journal, outer, "Anxious")
     assert "*Anxious*" in explain.body and "Try instead" in explain.body and "Reflect" in explain.body
+    assert "🧘 *Body exercise:* Butterfly hug" in explain.body
     assert first_q.body == "How strong is the feeling?" and len(first_q.rows) == 10
 
     [body] = tap(journal, first_q, "7")
@@ -112,13 +117,22 @@ def test_full_entry_goes_inner_to_outer_then_questions(journal):
         [reply] = tap(journal, reply, answer)
     assert isinstance(reply, Text) and "Free writing" in reply.body
 
-    saved, menu = journal.handle(msg("Big meeting tomorrow, can't stop thinking about it"), T0)
+    [closing] = journal.handle(msg("Big meeting tomorrow, can't stop thinking about it"), T0)
+    assert closing.body.startswith("Did you try the body exercise or the tip?")
+    assert titles(closing) == ["The exercise", "The tip", "Both", "Neither"]
+    [urge] = tap(journal, closing, "The exercise")
+    assert urge.body.startswith("Did the urge change?")
+    [helped] = tap(journal, urge, "Weaker")
+    assert helped.body.startswith("What helped?")
+    saved, menu = journal.handle(msg("The butterfly hug"), T0)
     assert "Saved" in saved.body
     assert "What food triggers the urge? Sweets / chocolate" in saved.body
     assert "Fear → Nervous → Anxious" in saved.body
     assert "Thu 08 Oct 2026, 21:30" in saved.body  # shown in the configured time zone
     assert "Where are you? Gym" in saved.body
     assert "Try instead:* Take a 10-minute walk" in saved.body
+    assert "Body exercise:* Butterfly hug" in saved.body
+    assert "Did the urge change? Weaker" in saved.body and "What helped? The butterfly hug" in saved.body
     assert isinstance(menu, Buttons)
     assert journal.store.get_state("111") is None
 

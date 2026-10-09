@@ -6,7 +6,7 @@ Everything the bot says comes from journal.yaml. This module is pure logic (no n
 """
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -29,6 +29,7 @@ BACK, SKIP, SKIPPED = "back", "skip", "(skipped)"
 RECENT_ENTRIES = 5
 FOOTER = "menu = cancel · skip = skip"
 OTHER = "✏️ Other (type it)"
+QUESTION_STEPS = ("opening", "checkin", "closing")
 MAX_CHOICES = 30
 
 
@@ -51,6 +52,7 @@ class Word:
     meaning: str
     tip: str
     reflect: str
+    body: str = ""  # a body exercise for nervous-system regulation
 
 
 @dataclass
@@ -67,6 +69,7 @@ class JournalConfig:
     wheel: dict[str, dict[str, MiddleWord]]  # inner -> middle -> MiddleWord
     free_writing: str
     wheel_question: str = "How are you feeling right now?"
+    closing: list[Question] = field(default_factory=list)  # asked after free writing
 
 
 def normalize(text: str) -> str:
@@ -101,6 +104,7 @@ def load_config(path: Path) -> JournalConfig:
     cfg = JournalConfig(
         opening=questions("opening_questions"),
         checkin=questions("checkin_questions"),
+        closing=questions("closing_questions"),
         wheel=wheel,
         free_writing=data.get("free_writing", "✍️ Write whatever is on your mind."),
         **({"wheel_question": data["wheel_question"]} if data.get("wheel_question") else {}),
@@ -112,10 +116,10 @@ def load_config(path: Path) -> JournalConfig:
 def validate(cfg: JournalConfig) -> None:
     """Fail at startup instead of having WhatsApp reject a message later."""
     errors = []
-    ids = [q.id for q in cfg.opening + cfg.checkin]
+    ids = [q.id for q in cfg.opening + cfg.checkin + cfg.closing]
     if len(ids) != len(set(ids)):
         errors.append("question ids must be unique")
-    for q in cfg.opening + cfg.checkin:
+    for q in cfg.opening + cfg.checkin + cfg.closing:
         if len(q.choices) + q.other > MAX_CHOICES:
             errors.append(f"question '{q.id}': at most {MAX_CHOICES} choices")
         if any(c in ("True", "False") for c in q.choices):
@@ -208,7 +212,7 @@ class Journal:
             "step": "opening" if self.cfg.opening else "inner",
             "i": 0,
             "path": [],
-            "draft": {"opening": [], "checkin": []},
+            "draft": {"opening": [], "checkin": [], "closing": []},
             "updated": now.isoformat(),
         }
         self.store.set_state(phone, state)
@@ -217,12 +221,15 @@ class Journal:
     def _key(self, state: dict) -> str:
         """Identifies the question on screen, so taps on old messages aren't mistaken for answers."""
         step = state["step"]
-        if step in ("opening", "checkin"):
+        if step in QUESTION_STEPS:
             return f"{step}:{self._question(state).id}"
         return f"{step}:{'/'.join(state['path'])}"
 
     def _question(self, state: dict) -> Question:
-        return (self.cfg.opening if state["step"] == "opening" else self.cfg.checkin)[state["i"]]
+        return self._questions(state["step"])[state["i"]]
+
+    def _questions(self, step: str) -> list[Question]:
+        return {"opening": self.cfg.opening, "checkin": self.cfg.checkin, "closing": self.cfg.closing}[step]
 
     def _options(self, state: dict) -> list[tuple[str, str]]:
         """(title, description) choices for the current step; empty for free-text steps."""
@@ -235,7 +242,7 @@ class Journal:
             return [(m.title, m.similar) for m in self.cfg.wheel[path[0]].values()]
         if step == "outer":
             return [(w.title, w.similar) for w in self.cfg.wheel[path[0]][path[1]].words.values()]
-        if step in ("opening", "checkin"):
+        if step in QUESTION_STEPS:
             q = self._question(state)
             return [(c, "") for c in q.choices] + ([(OTHER, "")] if q.other and q.choices else [])
         return []
@@ -289,9 +296,9 @@ class Journal:
                 picked = idx if idx in ("back", "more", "prev") else int(idx)
         elif text == BACK and step in ("middle", "outer"):
             picked = BACK
-        elif text == SKIP and step in ("opening", "checkin"):
+        elif text == SKIP and step in QUESTION_STEPS:
             picked = SKIP
-        elif text in ("more", "next") and step in ("opening", "checkin"):
+        elif text in ("more", "next") and step in QUESTION_STEPS:
             picked = "more"
         elif text.isdigit() and 1 <= int(text) <= len(options):
             picked = int(text) - 1
@@ -319,15 +326,16 @@ class Journal:
         replies: list[Reply] = []
 
         state.pop("page", None)
-        if step in ("opening", "checkin"):
+        if step in QUESTION_STEPS:
             draft[step].append({"q": self._question(state).text, "a": answer})
-            questions = self.cfg.opening if step == "opening" else self.cfg.checkin
-            if state["i"] + 1 < len(questions):
+            if state["i"] + 1 < len(self._questions(step)):
                 state["i"] += 1
             elif step == "opening":
                 state.update(step="inner", i=0)
-            else:
+            elif step == "checkin":
                 state.update(step="free", i=0)
+            else:
+                return self._save(state, now)
         elif step == "inner":
             state["path"] = [answer]
             state["step"] = "middle"
@@ -339,18 +347,25 @@ class Journal:
             word = self.cfg.wheel[inner][middle].words[answer]
             draft["feeling"] = [inner, middle, answer]
             draft["tip"] = word.tip
+            draft["body"] = word.body
             draft["reflect"] = word.reflect
             replies.append(Text(self._explain(word)))
             state.update(step="checkin" if self.cfg.checkin else "free", i=0)
         elif step == "free":
             draft["writing"] = answer
-            created = now.astimezone(self.tz)
-            self.store.add_entry(state["phone"], created.isoformat(), draft)
-            state["done"] = True
-            summary = format_entry({"created_at": created.isoformat(), **draft}, rich=True)
-            return [Text("✅ *Saved to your journal*\n\n" + summary), main_menu("What next?")]
+            if not self.cfg.closing:
+                return self._save(state, now)
+            state.update(step="closing", i=0)
 
         return replies + [self._ask(state)]
+
+    def _save(self, state: dict, now: datetime) -> list[Reply]:
+        draft = state["draft"]
+        created = now.astimezone(self.tz)
+        self.store.add_entry(state["phone"], created.isoformat(), draft)
+        state["done"] = True
+        summary = format_entry({"created_at": created.isoformat(), **draft}, rich=True)
+        return [Text("✅ *Saved to your journal*\n\n" + summary), main_menu("What next?")]
 
     @staticmethod
     def _explain(w: Word) -> str:
@@ -358,7 +373,8 @@ class Journal:
             f"*{w.title}*\n_{w.similar}_\n\n"
             f"💬 {w.meaning}\n\n"
             f"💡 *Try instead:* {w.tip}\n\n"
-            f"🤔 *Reflect:* {w.reflect}"
+            + (f"🧘 *Body exercise:* {w.body}\n\n" if w.body else "")
+            + f"🤔 *Reflect:* {w.reflect}"
         )
 
     # ---- reading the journal -----------------------------------------------------------------
@@ -420,10 +436,14 @@ def format_entry(e: dict, rich: bool) -> str:
         lines.append(f"• {qa['q']} {qa['a']}")
     if e.get("tip"):
         lines.append(f"{b('Try instead:')} {e['tip']}")
+    if e.get("body"):
+        lines.append(f"{b('Body exercise:')} {e['body']}")
     if e.get("reflect"):
         lines.append(f"{b('Reflect:')} {e['reflect']}")
     if e.get("writing"):
         lines.append(f"✍️ {e['writing']}")
+    for qa in e.get("closing", []):
+        lines.append(f"• {qa['q']} {qa['a']}")
     return "\n".join(lines)
 
 

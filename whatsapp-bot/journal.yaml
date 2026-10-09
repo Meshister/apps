@@ -7,7 +7,7 @@
 #            Put "Yes" / "No" in quotes, otherwise they turn into true / false.
 # Wheel:     inner circle -> middle ring -> outer ring, as in the Junto Institute "Emotion & Feeling Wheel".
 #            Middle-ring words have `similar` words; every outer word has: similar, meaning,
-#            tip (something to try instead) and reflect (a question to think about).
+#            tip (something to try instead), body (a body exercise) and reflect (a question to think about).
 
 # Asked at the start of every entry, before the wheel.
 opening_questions:
@@ -57,6 +57,17 @@ checkin_questions:
     text: "What does your body want?"
     choices: [Rest, Move, Eat, Cry, Talk, Be alone]
 
+# Asked at the end, after free writing.
+closing_questions:
+  - id: tried
+    text: "Did you try the body exercise or the tip?"
+    choices: [The exercise, The tip, Both, Neither]
+  - id: urge
+    text: "Did the urge change?"
+    choices: [It's gone, Weaker, Same, Stronger]
+  - id: helped
+    text: "What helped?"
+
 free_writing: "✍️ *Free writing*\nWrite whatever is on your mind: what happened, what you're thinking, or your answer to the reflection question.\n\nSend it as one message, or type *skip*."
 
 wheel:
@@ -68,11 +79,13 @@ wheel:
           similar: afraid, alarmed, spooked
           meaning: Feeling in danger right now; your body is getting ready to protect you.
           tip: Name 5 things you can see around you to bring yourself back to this moment.
+          body: "5-4-3-2-1: name 5 things you see, 4 you hear, 3 you can touch, 2 you smell and 1 you taste."
           reflect: What exactly feels threatening, and how likely is it really to happen?
         Helpless:
           similar: vulnerable, defenseless, stuck
           meaning: Feeling there is nothing you can do to change or protect yourself from a situation.
           tip: Pick one tiny thing that IS in your control and do it now, even just making a cup of tea.
+          body: "Feet on the floor: press your feet into the ground for 10 seconds, release, and feel your weight. Repeat 3 times."
           reflect: What part of this situation can I influence, even a little?
     Terror:
       similar: extreme fear, alarm, horror
@@ -81,11 +94,13 @@ wheel:
           similar: overwhelmed, frantic, alarmed
           meaning: A sudden wave of intense fear, often with a racing heart and fast breathing.
           tip: "Breathe out longer than you breathe in: in for 4, out for 6, five times."
+          body: "Physiological sigh: two short breaths in through the nose, then one long breath out through the mouth. Repeat 3 times."
           reflect: What set off this wave, and what helped me get through the last one?
         Hysterical:
           similar: out of control, frantic, wild
           meaning: Feelings so strong they seem impossible to contain.
           tip: Splash cold water on your face or hold something cold; it calms the nervous system quickly.
+          body: "Cold reset: hold something cold on your wrists or the back of your neck for 30 seconds, breathing slowly."
           reflect: What do I need most right now to feel safe again?
     Insecure:
       similar: unsure, self-doubting, uncertain
@@ -94,11 +109,13 @@ wheel:
           similar: less-than, small, unworthy
           meaning: Feeling less valuable or capable than other people.
           tip: Write down three things you did well this week, however small.
+          body: "Stand tall: feet apart, shoulders back, chin level. Take 5 slow breaths in this posture."
           reflect: Who am I comparing myself to, and is it a fair comparison?
         Inadequate:
           similar: not good enough, incapable
           meaning: Feeling you don't have what it takes to meet what's expected of you.
           tip: Break the task in front of you into the smallest next step and do only that.
+          body: "Hand on heart and belly: one hand on your chest, one on your belly. Breathe slowly into the lower hand for 1 minute."
           reflect: Whose standard am I trying to meet, mine or someone else's?
     Nervous:
       similar: uneasy, jittery, tense
@@ -107,11 +124,13 @@ wheel:
           similar: concerned, uneasy, troubled
           meaning: Your mind keeps going back to something that might go wrong.
           tip: "Give yourself 10 minutes of 'worry time': write every worry down, then close the notebook."
+          body: "Long exhale: breathe in for 4, out for 8. Keep going for 1 minute."
           reflect: Is this something I can act on now, or something to let be for today?
         Anxious:
           similar: tense, restless, on edge
           meaning: A general sense of unease about what's coming, often felt in the body.
           tip: Take a 10-minute walk and notice your feet touching the ground.
+          body: "Butterfly hug: cross your arms over your chest, hands on your shoulders, and tap left-right slowly for 1 minute."
           reflect: What am I expecting to happen, and how would I cope if it did?
     Horror:
       similar: shock, dread, repulsion
@@ -120,11 +139,13 @@ wheel:
           similar: humiliated, embarrassed, ashamed
           meaning: Deep embarrassment, as if everyone saw something you wanted to hide.
           tip: Talk to yourself about it the way a kind friend would talk to you.
+          body: "Self-hug: wrap your arms around yourself and squeeze gently for 30 seconds, breathing slowly."
           reflect: Will this matter in a week? In a year?
         Dread:
           similar: foreboding, sense of doom
           meaning: A heavy fear about something that is coming.
           tip: Plan the first small step toward facing it and put it in your calendar.
+          body: "Orienting: slowly turn your head and look around the room. Let your eyes rest on something pleasant for a few breaths."
           reflect: What is the worst, the best and the most likely outcome?
 
   Anger:
@@ -135,11 +156,13 @@ wheel:
           similar: loathing, bitter, detesting
           meaning: Intense dislike, often with deep hurt hiding underneath.
           tip: "Move the energy out of your body: a fast walk, a run, or punching a pillow."
+          body: "Wall push: push hard against a wall with both hands for 10 seconds, then release. Repeat 3 times."
           reflect: What hurt is underneath this hate?
         Hostile:
           similar: aggressive, combative
           meaning: Feeling ready to attack or fight back.
           tip: Wait 20 minutes before you send any message or have any conversation about it.
+          body: "Tense and release: clench your fists and shoulders for 5 seconds, then let go. Repeat 3 times and notice the difference."
           reflect: Which boundary of mine was crossed?
     Exasperated:
       similar: fed up, at my wits' end
@@ -148,11 +171,13 @@ wheel:
           similar: worked up, stirred up, restless
           meaning: Feeling unsettled and unable to sit still, as if something is buzzing inside.
           tip: "Do something physical and repetitive: tidy a drawer, stretch, or walk."
+          body: "Shake it out: shake your hands, arms and legs loosely for 1 minute, then stand still and notice your body."
           reflect: What has been building up that I haven't dealt with?
         Frustrated:
           similar: blocked, thwarted, fed up
           meaning: Something is standing between you and what you want.
           tip: Step away from the problem for 15 minutes, then try one different approach.
+          body: "Jaw release: open your mouth wide, move your jaw side to side, then massage your jaw muscles for 30 seconds."
           reflect: What exactly is in my way, and is there another route?
     Irritable:
       similar: grumpy, cranky, touchy
@@ -161,11 +186,13 @@ wheel:
           similar: bothered, irked, put out
           meaning: Mild anger at something small that keeps bothering you.
           tip: "Check the basics: are you hungry, tired or thirsty? Take care of that first."
+          body: "Long exhale: breathe in for 4, out for 8. Keep going for 1 minute."
           reflect: Is this about this moment, or about something bigger?
         Aggravated:
           similar: provoked, irritated
           meaning: Annoyance that has grown because it keeps happening.
           tip: Write down calmly what bothers you and what you would like instead.
+          body: "Cold reset: hold something cold on your wrists or the back of your neck for 30 seconds, breathing slowly."
           reflect: What would I like to ask for, clearly and kindly?
     Envy:
       similar: wanting what others have, covetous
@@ -174,11 +201,13 @@ wheel:
           similar: bitter, begrudging, wronged
           meaning: Lingering anger about being treated unfairly.
           tip: Write a letter you will never send, saying everything you feel.
+          body: "Humming: breathe in, then hum a low \"mmm\" on a long out-breath and feel the vibration in your chest. Repeat 5 times."
           reflect: What do I need to say, or let go of, to move forward?
         Jealous:
           similar: possessive, threatened
           meaning: Fear of losing something or someone important to another person.
           tip: Name what you're afraid of losing, then remind yourself what is still yours.
+          body: "Hand on heart and belly: one hand on your chest, one on your belly. Breathe slowly into the lower hand for 1 minute."
           reflect: What does this jealousy tell me I want or value?
     Disgust:
       similar: aversion, distaste, repulsion
@@ -187,11 +216,13 @@ wheel:
           similar: scorn, disdain, looking down on
           meaning: Feeling that someone is beneath you or not worth respect.
           tip: Try describing the situation from the other person's point of view.
+          body: "Orienting: slowly turn your head and look around the room. Let your eyes rest on something pleasant for a few breaths."
           reflect: Which of my values does this person seem to go against?
         Revolted:
           similar: repulsed, sickened, appalled
           meaning: A strong rejection of something that feels wrong or offensive.
           tip: "Create distance: step away from the person, place or thing causing it."
+          body: "Fresh air: step outside or open a window and take 5 slow breaths through your nose."
           reflect: What line was crossed for me here?
 
   Sadness:
@@ -202,11 +233,13 @@ wheel:
           similar: anguish, torment, deep pain
           meaning: Extreme emotional pain that feels hard to bear.
           tip: Reach out to someone you trust and tell them you're having a very hard time.
+          body: "Self-hug: wrap your arms around yourself and squeeze gently for 30 seconds, breathing slowly."
           reflect: What kind of support would help me most right now?
         Hurt:
           similar: wounded, stung
           meaning: Pain caused by something someone said or did.
           tip: "Put a hand on your chest and say to yourself: 'This hurts, and that's okay.'"
+          body: "Hand on heart and belly: one hand on your chest, one on your belly. Breathe slowly into the lower hand for 1 minute."
           reflect: What did I need from them that I didn't get?
     Sadness:
       similar: unhappy, down, blue
@@ -215,11 +248,13 @@ wheel:
           similar: low, down, hopeless
           meaning: A heavy, low mood that drains energy and interest.
           tip: Open a window or step outside into daylight for 10 minutes.
+          body: "Gentle movement: walk, stretch or dance to one song."
           reflect: When did I last feel even a little lighter, and what was I doing?
         Sorrow:
           similar: heartache, mournful
           meaning: Deep sadness, usually about a loss or disappointment.
           tip: Let yourself cry, or listen to music that matches the feeling.
+          body: "Humming: breathe in, then hum a low \"mmm\" on a long out-breath and feel the vibration in your chest. Repeat 5 times."
           reflect: What am I mourning?
     Disappointed:
       similar: let down, deflated
@@ -228,11 +263,13 @@ wheel:
           similar: disheartened, discouraged
           meaning: Losing heart after something turned out worse than expected.
           tip: Write down one thing you learned from this.
+          body: "Stand tall: feet apart, shoulders back, chin level. Take 5 slow breaths in this posture."
           reflect: What did I expect, and was that expectation realistic?
         Displeased:
           similar: unhappy, dissatisfied
           meaning: Something didn't meet your hopes or standards.
           tip: Decide on one thing you can change and one thing you will accept.
+          body: "Shake it out: shake your hands, arms and legs loosely for 1 minute, then stand still and notice your body."
           reflect: What would "good enough" look like here?
     Shameful:
       similar: ashamed, embarrassed, exposed
@@ -241,11 +278,13 @@ wheel:
           similar: remorseful, wishing I hadn't
           meaning: Wishing you had acted differently.
           tip: If someone was affected, consider a short, sincere apology.
+          body: "Hand on heart and belly: one hand on your chest, one on your belly. Breathe slowly into the lower hand for 1 minute."
           reflect: What would I do differently next time?
         Guilty:
           similar: at fault, blaming myself
           meaning: Feeling responsible for something wrong or harmful.
           tip: "Separate what you did from who you are: 'I made a mistake', not 'I am bad'."
+          body: "Butterfly hug: cross your arms over your chest, hands on your shoulders, and tap left-right slowly for 1 minute."
           reflect: Is this guilt fair, and what can I do to repair things?
     Neglected:
       similar: ignored, forgotten, overlooked
@@ -254,11 +293,13 @@ wheel:
           similar: cut off, excluded
           meaning: Feeling separated from others, as if you're on the outside.
           tip: Send a short message to one person you like, just to say hi.
+          body: "Self-hug: wrap your arms around yourself and squeeze gently for 30 seconds, breathing slowly."
           reflect: Who would I like to feel closer to?
         Lonely:
           similar: alone, missing connection
           meaning: Longing for a connection you're not getting right now.
           tip: Call someone instead of texting; hearing a voice helps.
+          body: "Humming: breathe in, then hum a low \"mmm\" on a long out-breath and feel the vibration in your chest. Repeat 5 times."
           reflect: What kind of connection am I missing most?
     Despair:
       similar: hopeless, defeated
@@ -267,11 +308,13 @@ wheel:
           similar: loss, mourning
           meaning: The deep sorrow that follows losing someone or something important.
           tip: "Do something to honor what you lost: look at a photo, light a candle, or write to them."
+          body: "Rocking: sit and gently rock side to side or back and forth for 1 minute."
           reflect: What do I miss most, and what would I like to keep from it?
         Powerless:
           similar: defeated, weak
           meaning: Feeling that nothing you do will make a difference.
           tip: Do one small thing you can finish today, and notice that you did it.
+          body: "Wall push: push hard against a wall with both hands for 10 seconds, then release. Repeat 3 times."
           reflect: Where in my life do I still have a choice?
 
   Surprise:
@@ -282,11 +325,13 @@ wheel:
           similar: jolted, startled
           meaning: A sudden jolt from something unexpected, often leaving you frozen.
           tip: Sit down, drink some water and give yourself time before deciding anything.
+          body: "Feet on the floor: press your feet into the ground for 10 seconds, release, and feel your weight. Repeat 3 times."
           reflect: What exactly happened, in simple facts?
         Dismayed:
           similar: taken aback, disturbed
           meaning: Alarm and disappointment at something unexpected.
           tip: Talk it through with someone to help make sense of it.
+          body: "Physiological sigh: two short breaths in through the nose, then one long breath out through the mouth. Repeat 3 times."
           reflect: What surprised me most, and why?
     Confused:
       similar: mixed up, unsure, puzzled
@@ -295,11 +340,13 @@ wheel:
           similar: disenchanted, let down, cynical
           meaning: Discovering that something or someone isn't what you believed.
           tip: Write what you believed before, and what you see now.
+          body: "Orienting: slowly turn your head and look around the room. Let your eyes rest on something pleasant for a few breaths."
           reflect: What do I still believe in?
         Perplexed:
           similar: puzzled, baffled, lost
           meaning: Not being able to understand or make sense of something.
           tip: Write the question you're trying to answer in one sentence.
+          body: "Gentle movement: walk, stretch or dance to one song."
           reflect: What information do I need, and who could help?
     Amazed:
       similar: wonder, impressed, astonished
@@ -308,11 +355,13 @@ wheel:
           similar: amazed, wide-eyed
           meaning: Great surprise at something you didn't think was possible.
           tip: Take a photo or write a note so you remember this moment.
+          body: "Long exhale: breathe in for 4, out for 8. Keep going for 1 minute."
           reflect: What did this show me that I didn't know before?
         Awe-struck:
           similar: in awe, wonder, humbled
           meaning: Feeling small before something vast, beautiful or powerful.
           tip: Slow down and stay with it a moment longer.
+          body: "Savor it in the body: close your eyes, notice where this good feeling sits in your body, and breathe into it for 1 minute."
           reflect: What makes this feel so big to me?
     Overcome:
       similar: overwhelmed, flooded
@@ -321,11 +370,13 @@ wheel:
           similar: lost for words, dumbfounded
           meaning: So affected that you can't find the words.
           tip: "Don't force words: draw, walk, or just breathe and let it settle."
+          body: "Humming: breathe in, then hum a low \"mmm\" on a long out-breath and feel the vibration in your chest. Repeat 5 times."
           reflect: If I could describe it in one word later, what would it be?
         Astounded:
           similar: flabbergasted, blown away
           meaning: Overwhelmed with surprise.
           tip: Share it with someone who will appreciate it.
+          body: "Feet on the floor: press your feet into the ground for 10 seconds, release, and feel your weight. Repeat 3 times."
           reflect: How does this change the way I see things?
     Moved:
       similar: touched, stirred, inspired
@@ -334,11 +385,13 @@ wheel:
           similar: energized, inspired, sparked
           meaning: Feeling energized and full of new ideas.
           tip: Write your ideas down now, before the spark fades.
+          body: "Shake it out: shake your hands, arms and legs loosely for 1 minute, then stand still and notice your body."
           reflect: What sparked this energy, and how can I use it?
         Touched:
           similar: moved, warmed, grateful
           meaning: Emotionally moved by kindness or beauty.
           tip: Tell the person what their gesture meant to you.
+          body: "Hand on heart and belly: one hand on your chest, one on your belly. Breathe slowly into the lower hand for 1 minute."
           reflect: What exactly touched me?
 
   Joy:
@@ -349,11 +402,13 @@ wheel:
           similar: glad, gratified
           meaning: Quiet happiness that something went well.
           tip: Take a moment to notice and enjoy it before moving on.
+          body: "Savor it in the body: close your eyes, notice where this good feeling sits in your body, and breathe into it for 1 minute."
           reflect: What did I do that helped this happen?
         Satisfied:
           similar: fulfilled, at ease
           meaning: Feeling that you have enough, or did enough.
           tip: Write this moment down so you can come back to it on harder days.
+          body: "Savor it in the body: close your eyes, notice where this good feeling sits in your body, and breathe into it for 1 minute."
           reflect: What does "enough" feel like for me?
     Happy:
       similar: glad, good, joyful
@@ -362,11 +417,13 @@ wheel:
           similar: entertained, tickled, playful
           meaning: Finding something funny or entertaining.
           tip: Share the laugh with someone.
+          body: "Open up: stretch your arms wide, lift your chest and take 3 deep breaths."
           reflect: What makes me laugh, and do I make room for it?
         Delighted:
           similar: thrilled, overjoyed
           meaning: Great pleasure at something wonderful.
           tip: Savor it by describing the moment in detail in your free writing.
+          body: "Savor it in the body: close your eyes, notice where this good feeling sits in your body, and breathe into it for 1 minute."
           reflect: How can I bring more of this into my life?
     Cheerful:
       similar: upbeat, bright, sunny
@@ -375,11 +432,13 @@ wheel:
           similar: jolly, merry, good-humored
           meaning: Light, friendly and in a good mood with others.
           tip: Use this mood to contact someone you've been meaning to reach out to.
+          body: "Gentle movement: walk, stretch or dance to one song."
           reflect: Who helps me feel this way?
         Blissful:
           similar: serene, carefree
           meaning: Deep, peaceful happiness without worries.
           tip: Close your eyes and take a mental "snapshot" of this feeling.
+          body: "Savor it in the body: close your eyes, notice where this good feeling sits in your body, and breathe into it for 1 minute."
           reflect: What made this moment of peace possible?
     Proud:
       similar: accomplished, confident, worthy
@@ -388,11 +447,13 @@ wheel:
           similar: victorious, accomplished
           meaning: Joy from succeeding at something challenging.
           tip: Celebrate in a small way; you earned it.
+          body: "Stand tall: feet apart, shoulders back, chin level. Take 5 slow breaths in this posture."
           reflect: Which of my strengths got me here?
         Illustrious:
           similar: respected, esteemed, admired
           meaning: Feeling recognized and valued by others.
           tip: Thank someone who helped you along the way.
+          body: "Stand tall: feet apart, shoulders back, chin level. Take 5 slow breaths in this posture."
           reflect: What do I want to be known for?
     Optimistic:
       similar: positive, hopeful, upbeat
@@ -401,11 +462,13 @@ wheel:
           similar: keen, looking forward
           meaning: Looking forward to something with energy.
           tip: "Turn the energy into a plan: write down the next 3 steps."
+          body: "Feet on the floor: press your feet into the ground for 10 seconds, release, and feel your weight. Repeat 3 times."
           reflect: What am I looking forward to most?
         Hopeful:
           similar: optimistic, encouraged
           meaning: Believing that things can get better.
           tip: Write down what you hope for, so you can come back to it.
+          body: "Open up: stretch your arms wide, lift your chest and take 3 deep breaths."
           reflect: What gives me this hope?
     Enthusiastic:
       similar: eager, keen, energized
@@ -414,11 +477,13 @@ wheel:
           similar: thrilled, pumped
           meaning: High energy and anticipation about something.
           tip: Channel it by starting on the thing you're excited about today.
+          body: "Long exhale: breathe in for 4, out for 8. Keep going for 1 minute."
           reflect: What about this excites me most?
         Zeal:
           similar: passionate, driven, fired up
           meaning: Strong passion and drive toward a goal.
           tip: Pick the most important task and give it your energy now.
+          body: "Feet on the floor: press your feet into the ground for 10 seconds, release, and feel your weight. Repeat 3 times."
           reflect: Why does this goal matter so much to me?
     Elation:
       similar: ecstatic, exhilarated, on a high
@@ -427,11 +492,13 @@ wheel:
           similar: elated, on top of the world
           meaning: Intense joy and excitement, like being on a high.
           tip: Enjoy it, and wait a day before making any big decisions.
+          body: "Feet on the floor: press your feet into the ground for 10 seconds, release, and feel your weight. Repeat 3 times."
           reflect: What brought me to this high?
         Jubilation:
           similar: celebrating, overjoyed
           meaning: Joyful celebration of a success or good news.
           tip: Celebrate with people you love.
+          body: "Gentle movement: walk, stretch or dance to one song."
           reflect: Who do I want to share this with, and why?
 
   Love:
@@ -442,11 +509,13 @@ wheel:
           similar: charmed, captivated, spellbound
           meaning: Delighted and captivated, as if under a spell.
           tip: Be fully present; put the phone away and enjoy it.
+          body: "Savor it in the body: close your eyes, notice where this good feeling sits in your body, and breathe into it for 1 minute."
           reflect: What exactly captivates me?
         Rapture:
           similar: ecstasy, bliss
           meaning: Overwhelming joy and love that fills you completely.
           tip: Describe this feeling in detail in your free writing so you can return to it.
+          body: "Savor it in the body: close your eyes, notice where this good feeling sits in your body, and breathe into it for 1 minute."
           reflect: What opened me up to this feeling?
     Affectionate:
       similar: warm, loving, tender
@@ -455,11 +524,13 @@ wheel:
           similar: loving, amorous
           meaning: Loving feelings toward someone special.
           tip: "Express it: a message, a note, or a small gesture."
+          body: "Hand on heart and belly: one hand on your chest, one on your belly. Breathe slowly into the lower hand for 1 minute."
           reflect: How do I like to give and receive love?
         Fondness:
           similar: warmth, affection, liking
           meaning: Warm, gentle liking for someone or something.
           tip: Let the person know you're thinking of them.
+          body: "Hand on heart and belly: one hand on your chest, one on your belly. Breathe slowly into the lower hand for 1 minute."
           reflect: What do I appreciate about them?
     Longing:
       similar: yearning, missing, pining
@@ -468,11 +539,13 @@ wheel:
           similar: nostalgic, wistful
           meaning: Tender feelings about memories from the past.
           tip: Look at old photos or write about a memory you cherish.
+          body: "Self-hug: wrap your arms around yourself and squeeze gently for 30 seconds, breathing slowly."
           reflect: What from the past would I like more of now?
         Attracted:
           similar: drawn to, interested
           meaning: Being pulled toward someone or something.
           tip: Notice what attracts you, without rushing to act on it.
+          body: "Long exhale: breathe in for 4, out for 8. Keep going for 1 minute."
           reflect: What quality draws me in?
     Desire:
       similar: wanting, craving, wishing
@@ -481,11 +554,13 @@ wheel:
           similar: intensity, fire, desire
           meaning: A strong, intense feeling of wanting or caring deeply.
           tip: "Give it a healthy outlet: create, move, or talk about it."
+          body: "Gentle movement: walk, stretch or dance to one song."
           reflect: What am I truly passionate about?
         Infatuation:
           similar: crush, smitten
           meaning: Intense but often short-lived attraction or admiration.
           tip: Enjoy it, and give it time before big decisions.
+          body: "Feet on the floor: press your feet into the ground for 10 seconds, release, and feel your weight. Repeat 3 times."
           reflect: What am I imagining about them, and what do I actually know?
     Tenderness:
       similar: gentle, soft, caring
@@ -494,11 +569,13 @@ wheel:
           similar: kind, nurturing, supportive
           meaning: Wanting to look after someone's wellbeing.
           tip: Do one kind thing for someone, and one for yourself.
+          body: "Hand on heart and belly: one hand on your chest, one on your belly. Breathe slowly into the lower hand for 1 minute."
           reflect: Who cares for me in this way?
         Compassionate:
           similar: empathetic, understanding
           meaning: Feeling someone's pain and wanting to help.
           tip: Offer support, and give yourself the same kindness.
+          body: "Humming: breathe in, then hum a low \"mmm\" on a long out-breath and feel the vibration in your chest. Repeat 5 times."
           reflect: How can I help without carrying it all myself?
     Peaceful:
       similar: calm, serene, at peace
@@ -507,9 +584,11 @@ wheel:
           similar: unburdened, eased
           meaning: Tension letting go after a worry has passed.
           tip: Take a deep breath and let your shoulders drop.
+          body: "Physiological sigh: two short breaths in through the nose, then one long breath out through the mouth. Repeat 3 times."
           reflect: What was I carrying, and what helped me put it down?
         Satisfied:
           similar: fulfilled, at peace
           meaning: Calm contentment that things are as they should be.
           tip: Spend a few minutes doing nothing, just enjoying it.
+          body: "Savor it in the body: close your eyes, notice where this good feeling sits in your body, and breathe into it for 1 minute."
           reflect: What brings me this peace?
